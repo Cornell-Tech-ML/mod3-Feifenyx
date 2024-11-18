@@ -65,9 +65,10 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
+    cur_ord = ordinal + 0
     for i in range(len(shape) - 1, -1, -1):
-        out_index[i] = ordinal % shape[i]
-        ordinal //= shape[i]
+        out_index[i] = int(cur_ord % shape[i])
+        cur_ord //= shape[i]
 
 
 def broadcast_index(
@@ -93,6 +94,7 @@ def broadcast_index(
     """
     for i in range(len(shape)):
         out_index[i] = big_index[i + len(big_shape) - len(shape)] if shape[i] > 1 else 0
+    return None
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -120,7 +122,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         dim2 = shape2[-i] if len(shape2) >= i else 1
 
         if dim1 != dim2 and dim1 != 1 and dim2 != 1:
-            raise IndexingError()
+            raise IndexingError(f'Broadcast failure {shape1} {shape2}')
 
         broadcasted_shape[-i] = max(dim1, dim2)
 
@@ -280,8 +282,8 @@ class TensorData:
 
         return TensorData(
             self._storage,
-            tuple(self.shape[i] for i in order),
-            tuple(self.strides[i] for i in order),
+            tuple([self.shape[i] for i in order]),
+            tuple([self._strides[i] for i in order]),
         )
 
     def to_string(self) -> str:

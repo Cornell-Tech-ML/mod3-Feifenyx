@@ -121,9 +121,10 @@ class Mul(Function):
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Return the gradients of both input tensors using the backpropagated derivative."""
-        (t1, t2) = ctx.saved_values
-        return grad_output.f.mul_zip(grad_output, t2), grad_output.f.mul_zip(
-            grad_output, t1
+        t1, t2 = ctx.saved_values
+        return (
+            grad_output.f.mul_zip(t2, grad_output), 
+            grad_output.f.mul_zip(t1, grad_output),
         )
 
 
@@ -135,7 +136,7 @@ class Sigmoid(Function):
         return t1.f.sigmoid_map(t1)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> float:
+    def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Compute the gradient of the sigmoid function using the backpropagated derivative."""
         (t1,) = ctx.saved_values
         sigmoid_t1 = t1.f.sigmoid_map(t1)
@@ -155,10 +156,10 @@ class ReLU(Function):
         return t1.f.relu_map(t1)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> float:
+    def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Compute the gradient of the ReLU function using the backpropagated derivative."""
         (t1,) = ctx.saved_values
-        return t1.f.relu_back_zip(t1, grad_output)
+        return grad_output.f.relu_back_zip(t1, grad_output)
 
 
 class Log(Function):
@@ -169,10 +170,10 @@ class Log(Function):
         return t1.f.log_map(t1)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> float:
+    def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Compute the gradient of the log function using the backpropagated derivative."""
         (t1,) = ctx.saved_values
-        return t1.f.log_back_zip(t1, grad_output)
+        return grad_output.f.log_back_zip(t1, grad_output)
 
 
 class Exp(Function):
@@ -183,20 +184,17 @@ class Exp(Function):
         return t1.f.exp_map(t1)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> float:
+    def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Compute the gradient of the exponential function using the backpropagated derivative."""
         (t1,) = ctx.saved_values
-        return t1.f.mul_zip(t1.f.exp_map(t1), grad_output)
+        return grad_output.f.mul_zip(t1.f.exp_map(t1), grad_output)
 
 
 class Sum(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, dim: Tensor) -> Tensor:
         """Compute the sum of elements in the tensor along a given dimension."""
-        if dim is not None:
-            return a.f.add_reduce(a, int(dim.item()))
-        else:
-            return a.f.add_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
+        return a.f.add_reduce(a, int(dim.item()))
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
@@ -208,24 +206,28 @@ class LT(Function):
     @staticmethod
     def forward(ctx: Context, t1: Tensor, t2: Tensor) -> Tensor:
         """Return the less than function $f(x, y) = 1.0$ if $x < y$ else $0.0$."""
+        ctx.save_for_backward(t1.shape, t2.shape)
         return t1.f.lt_zip(t1, t2)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Return zero gradients since the forward pass output is constant (1.0 or 0.0)."""
-        return grad_output.zeros(), grad_output.zeros()
+        t1_shape, t2_shape = ctx.saved_values
+        return zeros(t1_shape), zeros(t2_shape)
 
 
 class EQ(Function):
     @staticmethod
     def forward(ctx: Context, t1: Tensor, t2: Tensor) -> Tensor:
         """Return the equality function $f(x, y) = 1.0$ if $x == y$ else $0.0$."""
+        ctx.save_for_backward(t1.shape, t2.shape)
         return t1.f.eq_zip(t1, t2)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Return zero gradients since the forward pass output is constant (1.0 or 0.0)."""
-        return grad_output.zeros(), grad_output.zeros()
+        t1_shape, t2_shape = ctx.saved_values
+        return zeros(t1_shape), zeros(t2_shape)
 
 
 class IsClose(Function):

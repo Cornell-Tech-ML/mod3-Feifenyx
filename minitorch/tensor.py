@@ -369,7 +369,7 @@ class Tensor:
     def all(self, dim: Optional[int] = None) -> Tensor:
         """Apply the All operation along a given dimension."""
         if dim is None:
-            return All.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
+            return All.apply(self.view(self.size), self._ensure_tensor(0))
         else:
             return All.apply(self, self._ensure_tensor(dim))
 
@@ -409,17 +409,11 @@ class Tensor:
 
     def permute(self, *dim: int) -> Tensor:
         """Apply the Permute operation along a given dimension."""
-        if dim is None:
-            return self
-        else:
-            return Permute.apply(self, tensor(list(dim)))
+        return Permute.apply(self, tensor(list(dim)))
 
     def view(self, *dim: int) -> Tensor:
         """Apply the View operation along a given dimension."""
-        if dim is None:
-            return self
-        else:
-            return View.apply(self, tensor(list(dim)))
+        return View.apply(self, tensor(list(dim)))
 
     def zero_grad_(self) -> None:
         """Reset the derivative on this tensor."""
