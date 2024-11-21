@@ -260,3 +260,7 @@ Parallel structure is already optimal.
 Allocation hoisting:  
 No allocation hoisting found  
 None  
+
+# Performance Comparison: Fast vs. GPU Operations
+
+<img src="https://github.com/Cornell-Tech-ML/mod3-Feifenyx/blob/master/timing.png" width="50%">
