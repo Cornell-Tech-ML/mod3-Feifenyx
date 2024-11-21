@@ -34,13 +34,10 @@ The files that will be synced are:
 # Parallel Analytics Diagnostics
 
 ## MAP
- 
-================================================================================
- Parallel Accelerator Optimizing:  Function tensor_map.<locals>._map, minitorch\fast_ops.py (163)
-================================================================================
 
+Parallel Accelerator Optimizing: Function tensor_map.<locals>._map, minitorch\fast_ops.py (163)
 
-Parallel loop listing for  Function tensor_map.<locals>._map, minitorch\fast_ops.py (163)
+Parallel loop listing for Function tensor_map.<locals>._map, minitorch\fast_ops.py (163)
 -------------------------------------------------------------------------------------------------|loop #ID
     def _map(                                                                                    |
         out: Storage,                                                                            |
@@ -82,13 +79,10 @@ No allocation hoisting found
 None
 
 ## ZIP
- 
-================================================================================
- Parallel Accelerator Optimizing:  Function tensor_zip.<locals>._zip, minitorch\fast_ops.py (212)
-================================================================================
 
+Parallel Accelerator Optimizing: Function tensor_zip.<locals>._zip, minitorch\fast_ops.py (212)
 
-Parallel loop listing for  Function tensor_zip.<locals>._zip, minitorch\fast_ops.py (212)
+Parallel loop listing for Function tensor_zip.<locals>._zip, minitorch\fast_ops.py (212)
 -----------------------------------------------------------------------------|loop #ID
     def _zip(                                                                |
         out: Storage,                                                        |
@@ -141,13 +135,10 @@ No allocation hoisting found
 None
 
 ## REDUCE
- 
-================================================================================
- Parallel Accelerator Optimizing:  Function tensor_reduce.<locals>._reduce, minitorch\fast_ops.py (270)
-================================================================================
 
+Parallel Accelerator Optimizing: Function tensor_reduce.<locals>._reduce, minitorch\fast_ops.py (270)
 
-Parallel loop listing for  Function tensor_reduce.<locals>._reduce, minitorch\fast_ops.py (270)
+Parallel loop listing for Function tensor_reduce.<locals>._reduce, minitorch\fast_ops.py (270)
 ------------------------------------------------------------------------------------------------------|loop #ID
     def _reduce(                                                                                      |
         out: Storage,                                                                                 |
@@ -187,13 +178,10 @@ No allocation hoisting found
 None
 
 ## MATRIX MULTIPLY
- 
-================================================================================
- Parallel Accelerator Optimizing:  Function _tensor_matrix_multiply, minitorch\fast_ops.py (294)
-================================================================================
 
+Parallel Accelerator Optimizing: Function _tensor_matrix_multiply, minitorch\fast_ops.py (294)
 
-Parallel loop listing for  Function _tensor_matrix_multiply, minitorch\fast_ops.py (294)
+Parallel loop listing for Function _tensor_matrix_multiply, minitorch\fast_ops.py (294)
 -------------------------------------------------------------------------------------------------|loop #ID
 def _tensor_matrix_multiply(                                                                     |
     out: Storage,                                                                                |
@@ -238,8 +226,8 @@ def _tensor_matrix_multiply(                                                    
         None : Fills in `out`                                                                    |
                                                                                                  |
     """                                                                                          |
-    a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0                                       |
-    b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0                                       |
+    a_batch_stride = a_strides if a_shape > 1 else 0                                       |
+    b_batch_stride = b_strides if b_shape > 1 else 0                                       |
                                                                                                  |
     K = a_shape[-1] # must be equal to b_shape[-2]                                               |
     D, R, C = out_shape[:3]                                                                      |
@@ -249,7 +237,7 @@ def _tensor_matrix_multiply(                                                    
         for r in range(R):                                                                       |
             for c in range(C):                                                                   |
                 out_position = (                                                                 |
-                    d * out_strides[0] +                                                         |
+                    d * out_strides +                                                         |
                     r * out_strides[1] +                                                         |
                     c * out_strides[2]                                                           |
                 )                                                                                |
