@@ -386,8 +386,41 @@ def _mm_practice(out: Storage, a: Storage, b: Storage, size: int) -> None:
 
     """
     BLOCK_DIM = 32
-    # TODO: Implement for Task 3.3.
-    raise NotImplementedError("Need to implement for Task 3.3")
+    
+    # Allocate shared memory for matrix a
+    a_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+    # Allocate shared memory for matrix b
+    b_shared = cuda.shared.array((BLOCK_DIM, BLOCK_DIM), numba.float64)
+
+    # Calculate global thread index for x-dimension
+    i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
+    # Calculate global thread index for y-dimension
+    j = cuda.blockIdx.y * cuda.blockDim.y + cuda.threadIdx.y
+    # Get local thread index within block for x-dimension
+    pi = cuda.threadIdx.x
+    # Get local thread index within block for y-dimension
+    pj = cuda.threadIdx.y
+    
+    # Check if the thread is within the matrix bounds
+    if i < size and j < size:
+        # Load element from matrix a in global memory into shared memory
+        a_shared[pi, pj] = a[i * size + j]
+        # Load element from matrix b in global memory into shared memory
+        b_shared[pi, pj] = b[i * size + j]
+    
+        # Synchronize threads to ensure all data is loaded before computation
+        cuda.syncthreads()
+    
+        # Initialize accumulator for dot product
+        dot_product = 0.0
+
+        # Loop over the k dimension
+        for k in range(size):
+            # Perform dot product for this element
+            dot_product += a_shared[pi, k] * b_shared[k, pj]
+        
+        # Write the computed result to the output matrix in global memory
+        out[i * size + j] = dot_product
 
 
 jit_mm_practice = jit(_mm_practice)
@@ -455,8 +488,40 @@ def _tensor_matrix_multiply(
     #    a) Copy into shared memory for a matrix.
     #    b) Copy into shared memory for b matrix
     #    c) Compute the dot produce for position c[i, j]
-    # TODO: Implement for Task 3.4.
-    raise NotImplementedError("Need to implement for Task 3.4")
+    
+    # Extract dimensions from shapes
+    I, J, K = out_shape[-2], out_shape[-1], a_shape[-1]
+    
+    # Initialize accumulator for dot product
+    dot_product = 0.0
+    
+    # Iterate over shared dimension in blocks
+    for s in range(0, K, BLOCK_DIM):
+        # Check if thread is within bounds for matrix a
+        if (i < I) and ((s + pj) < K):
+            # Copy element from matrix a in global memory into shared memory
+            a_shared[pi, pj] = a_storage[batch * a_batch_stride + i * a_strides[-2] + (s + pj) * a_strides[-1]]
+
+        # Check if thread is within bounds for matrix b
+        if ((s + pi) < K) and (j < J):
+            # Copy element from matrix b in global memory into shared memory
+            b_shared[pi, pj] = b_storage[batch * b_batch_stride + (s + pi) * b_strides[-2] + j * b_strides[-1]]
+
+        # Synchronize threads to ensure all data is loaded
+        cuda.syncthreads()
+
+        # Loop over the k dimension
+        for k in range(BLOCK_DIM):
+            # Compute and accumulate partial dot product
+            dot_product += a_shared[pi, k] * b_shared[k, pj]
+
+        # Synchronize threads before next iteration
+        cuda.syncthreads()
+
+    # Check if thread is within output bounds
+    if i < I and j < J:
+        # Write result to the output matrix in global memory
+        out[batch * out_strides[0] + i * out_strides[-2] + j * out_strides[-1]] = dot_product
 
 
 tensor_matrix_multiply = jit(_tensor_matrix_multiply)
