@@ -65,13 +65,12 @@ Parallel loop listing for Function tensor_map.<locals>._map, minitorch\fast_ops.
 Attempting fusion of parallel loops (combines loops with similar properties)...
 Following the attempted fusion of parallel for-loops there are 2 parallel for-
 loop(s) (originating from loops labelled: #0, #1).
---------------------------------------------------------------------------------
+
 ----------------------------- Before Optimisation ------------------------------
---------------------------------------------------------------------------------
+
 ------------------------------ After Optimisation ------------------------------
 Parallel structure is already optimal.
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 
 ---------------------------Loop invariant code motion---------------------------
 Allocation hoisting:
@@ -121,13 +120,12 @@ Parallel loop listing for Function tensor_zip.<locals>._zip, minitorch\fast_ops.
 Attempting fusion of parallel loops (combines loops with similar properties)...
 Following the attempted fusion of parallel for-loops there are 2 parallel for-
 loop(s) (originating from loops labelled: #2, #3).
---------------------------------------------------------------------------------
+
 ----------------------------- Before Optimisation ------------------------------
---------------------------------------------------------------------------------
+
 ------------------------------ After Optimisation ------------------------------
 Parallel structure is already optimal.
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 
 ---------------------------Loop invariant code motion---------------------------
 Allocation hoisting:
@@ -164,13 +162,12 @@ Parallel loop listing for Function tensor_reduce.<locals>._reduce, minitorch\fas
 Attempting fusion of parallel loops (combines loops with similar properties)...
 Following the attempted fusion of parallel for-loops there are 1 parallel for-
 loop(s) (originating from loops labelled: #4).
---------------------------------------------------------------------------------
+
 ----------------------------- Before Optimisation ------------------------------
---------------------------------------------------------------------------------
+
 ------------------------------ After Optimisation ------------------------------
 Parallel structure is already optimal.
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 
 ---------------------------Loop invariant code motion---------------------------
 Allocation hoisting:
@@ -250,19 +247,18 @@ def _tensor_matrix_multiply(                                                    
                     )                                                                            |
                                                                                                  |
                 out[out_position] = dot_product                                                  |
---------------------------------- Fusing loops ---------------------------------
+--------------------------------- Fusing loops ---------------------------------  
 Attempting fusion of parallel loops (combines loops with similar properties)...
 Following the attempted fusion of parallel for-loops there are 1 parallel for-
-loop(s) (originating from loops labelled: #5).
---------------------------------------------------------------------------------
------------------------------ Before Optimisation ------------------------------
---------------------------------------------------------------------------------
------------------------------- After Optimisation ------------------------------
-Parallel structure is already optimal.
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+loop(s) (originating from loops labelled: #5).  
 
----------------------------Loop invariant code motion---------------------------
-Allocation hoisting:
-No allocation hoisting found
-None
+----------------------------- Before Optimisation ------------------------------  
+
+------------------------------ After Optimisation ------------------------------  
+Parallel structure is already optimal.  
+
+
+---------------------------Loop invariant code motion---------------------------  
+Allocation hoisting:  
+No allocation hoisting found  
+None  
