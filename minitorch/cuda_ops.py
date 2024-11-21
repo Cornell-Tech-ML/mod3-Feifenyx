@@ -512,8 +512,10 @@ def _tensor_matrix_multiply(
 
         # Loop over the k dimension
         for k in range(BLOCK_DIM):
-            # Compute and accumulate partial dot product
-            dot_product += a_shared[pi, k] * b_shared[k, pj]
+            # Ensure we only use valid data within K to avoid stale data in shared memory
+            if s + k < K:
+                # Compute and accumulate partial dot product
+                dot_product += a_shared[pi, k] * b_shared[k, pj]
 
         # Synchronize threads before next iteration
         cuda.syncthreads()
