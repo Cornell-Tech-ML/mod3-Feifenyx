@@ -263,4 +263,4 @@ None
 
 # Performance Comparison: CPU vs GPU Operations
 
-<img src="https://github.com/Cornell-Tech-ML/mod3-Feifenyx/blob/master/timing.png" width="60%">
+<img src="https://github.com/Cornell-Tech-ML/mod3-Feifenyx/blob/master/timing.png">
