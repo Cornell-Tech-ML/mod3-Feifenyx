@@ -1,3 +1,8 @@
+"""Initializes the package by importing classes and modules from testing, fast_ops, cuda_ops,
+tensor_data, tensor_functions, tensor_ops, scalar, scalar_functions, module, autodiff, tensor,
+datasets, testing, and optim submodules.
+"""
+
 from .testing import MathTest, MathTestVariable  # type: ignore # noqa: F401,F403
 from .fast_ops import *  # noqa: F401,F403
 from .cuda_ops import *  # noqa: F401,F403
