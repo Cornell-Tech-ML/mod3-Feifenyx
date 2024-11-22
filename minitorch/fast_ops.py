@@ -284,7 +284,8 @@ def tensor_reduce(
             reduce_value = out[i]
             for j in range(a_shape[reduce_dim]):
                 reduce_value = fn(
-                    reduce_value, a_storage[a_position + j * a_strides[reduce_dim]]
+                    reduce_value,
+                    float(a_storage[a_position + j * a_strides[reduce_dim]]),
                 )
 
             out[i] = reduce_value
