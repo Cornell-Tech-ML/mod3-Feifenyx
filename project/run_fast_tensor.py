@@ -103,7 +103,7 @@ class FastTrain:
                 out = self.model.forward(X).view(y.shape[0])
                 y2 = minitorch.tensor(data.y)
                 correct = int(((out.detach() > 0.5) == y2).sum()[0])
-                
+
                 # Calculate average elapsed time for each epoch
                 epoch_time = (time.time() - start_time) / (epoch + 1)
                 log_fn(epoch, total_loss, correct, losses, epoch_time=epoch_time)

@@ -122,7 +122,7 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         dim2 = shape2[-i] if len(shape2) >= i else 1
 
         if dim1 != dim2 and dim1 != 1 and dim2 != 1:
-            raise IndexingError(f'Broadcast failure {shape1} {shape2}')
+            raise IndexingError(f"Broadcast failure {shape1} {shape2}")
 
         broadcasted_shape[-i] = max(dim1, dim2)
 

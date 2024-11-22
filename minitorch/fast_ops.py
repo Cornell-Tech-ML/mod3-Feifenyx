@@ -7,7 +7,6 @@ from numba import prange
 from numba import njit as _njit
 
 from .tensor_data import (
-    MAX_DIMS,
     broadcast_index,
     index_to_position,
     shape_broadcast,
@@ -30,6 +29,7 @@ Fn = TypeVar("Fn")
 
 
 def njit(fn: Fn, **kwargs: Any) -> Fn:
+    """Decorator for Numba JIT compilation."""
     return _njit(inline="always", **kwargs)(fn)  # type: ignore
 
 
@@ -168,8 +168,9 @@ def tensor_map(
         in_shape: Shape,
         in_strides: Strides,
     ) -> None:
-        
-        if (np.array_equal(out_strides, in_strides) and np.array_equal(out_shape, in_shape)):
+        if np.array_equal(out_strides, in_strides) and np.array_equal(
+            out_shape, in_shape
+        ):
             for i in prange(len(out)):
                 out[i] = fn(in_storage[i])
 
@@ -220,11 +221,10 @@ def tensor_zip(
         b_shape: Shape,
         b_strides: Strides,
     ) -> None:
-    
         if (
-            np.array_equal(out_strides, a_strides) 
+            np.array_equal(out_strides, a_strides)
             and np.array_equal(out_shape, a_shape)
-            and np.array_equal(out_strides, b_strides) 
+            and np.array_equal(out_strides, b_strides)
             and np.array_equal(out_shape, b_shape)
         ):
             for i in prange(len(out)):
@@ -276,7 +276,6 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
-        
         for i in prange(len(out)):
             out_index = np.empty_like(out_shape, dtype=np.int32)
             to_index(i, out_shape, out_index)
@@ -284,7 +283,9 @@ def tensor_reduce(
 
             reduce_value = out[i]
             for j in range(a_shape[reduce_dim]):
-                reduce_value = fn(reduce_value, a_storage[a_position + j * a_strides[reduce_dim]])
+                reduce_value = fn(
+                    reduce_value, a_storage[a_position + j * a_strides[reduce_dim]]
+                )
 
             out[i] = reduce_value
 
@@ -337,7 +338,7 @@ def _tensor_matrix_multiply(
     a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
     b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
 
-    K = a_shape[-1] # must be equal to b_shape[-2]
+    K = a_shape[-1]  # must be equal to b_shape[-2]
     D, R, C = out_shape[:3]
 
     # out[d, r, c] = sum_k a[d_a, r, k] * b[d_b, k, c]
@@ -345,16 +346,18 @@ def _tensor_matrix_multiply(
         for r in range(R):
             for c in range(C):
                 out_position = (
-                    d * out_strides[0] +
-                    r * out_strides[1] +
-                    c * out_strides[2]
+                    d * out_strides[0] + r * out_strides[1] + c * out_strides[2]
                 )
 
                 dot_product = 0.0
                 for k in range(K):
                     dot_product += (
-                        a_storage[d * a_batch_stride + r * a_strides[1] + k * a_strides[2]] *
-                        b_storage[d * b_batch_stride + k * b_strides[1] + c * b_strides[2]]
+                        a_storage[
+                            d * a_batch_stride + r * a_strides[1] + k * a_strides[2]
+                        ]
+                        * b_storage[
+                            d * b_batch_stride + k * b_strides[1] + c * b_strides[2]
+                        ]
                     )
 
                 out[out_position] = dot_product

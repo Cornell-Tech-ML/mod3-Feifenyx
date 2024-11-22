@@ -123,7 +123,7 @@ class Mul(Function):
         """Return the gradients of both input tensors using the backpropagated derivative."""
         t1, t2 = ctx.saved_values
         return (
-            grad_output.f.mul_zip(t2, grad_output), 
+            grad_output.f.mul_zip(t2, grad_output),
             grad_output.f.mul_zip(t1, grad_output),
         )
 
