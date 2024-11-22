@@ -261,6 +261,6 @@ Allocation hoisting:
 No allocation hoisting found  
 None  
 
-# Performance Comparison: Fast vs. GPU Operations
+# Performance Comparison: CPU vs GPU Operations
 
-<img src="https://github.com/Cornell-Tech-ML/mod3-Feifenyx/blob/master/timing.png" width="50%">
+<img src="https://github.com/Cornell-Tech-ML/mod3-Feifenyx/blob/master/timing.png" width="60%">

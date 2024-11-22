@@ -19,9 +19,9 @@ class Network(minitorch.Module):
         self.layer3 = Linear(hidden_layers, 1)
 
     def forward(self, x):
-        middle = self.layer1.forward(x).relu()
-        end = self.layer2.forward(middle).relu()
-        return self.layer3.forward(end).sigmoid()
+        h = self.layer1.forward(x).relu()
+        h = self.layer2.forward(h).relu()
+        return self.layer3.forward(h).sigmoid()
 
 
 class Linear(minitorch.Module):
@@ -31,12 +31,12 @@ class Linear(minitorch.Module):
         self.bias = RParam(out_size)
         self.out_size = out_size
 
-    def forward(self, inputs):
-        batch_size, in_size = inputs.shape
+    def forward(self, x):
+        batch_size, in_size = x.shape
         ret = self.bias.value.view(self.out_size)
         return (
             self.weights.value.view(1, in_size, self.out_size) 
-            * inputs.view(batch_size, in_size, 1)
+            * x.view(batch_size, in_size, 1)
         ).sum(1).view(batch_size, self.out_size) + ret
 
 def default_log_fn(epoch, total_loss, correct, losses):
